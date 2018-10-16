@@ -1,0 +1,73 @@
+<template>
+  <main class="section columns">
+
+    <div class="column is-half">
+      <figure class="image is-4by3">
+        <img src="https://bulma.io/images/placeholders/640x480.png">
+      </figure>
+    </div>
+
+    <div class="column">
+      <div class="notification" style="background-color: #eee">
+        <i class="far fa-lightbulb"></i>&nbsp;The memocloud is an Web app to upload your idea, URL of favorite website, quotes, and so on only for your purpose.
+        You can share those texts from anywhere and any of your devices.
+      </div>
+
+      <div class="box">
+
+        <div class="level">
+          <h2 class="level-item title is-4">Sign in</h2>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label">
+            <label class="label">E-mail</label>
+          </div>
+          <div class="field-body">
+            <input class="input" type="email" placeholder="e-mail" required>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label">
+            <label class="label">Password</label>
+          </div>
+          <div class="field-body">
+            <input class="input" type="password" placeholder="password" required maxlength=20 minlength=6>
+          </div>
+        </div>
+
+        <div class="is-centered columns">
+          <div class="column is-half">
+            <a class="button is-primary is-fullwidth">Sign in</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="box">
+        <div class="is-centered columns">
+          <div class="column is-half">
+            <a class="button is-primary is-fullwidth">Sign up</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</template>
+
+<script>
+export default {
+  name: 'Signup',
+  data () {
+    return {
+      msg: 'Welcome to Your Vue.js App'
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>
