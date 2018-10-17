@@ -4,15 +4,22 @@ import Main from '@/components/Main'
 import Signup from '@/components/Signup'
 import Signin from '@/components/Signin'
 import Signedit from '@/components/Signedit'
+import firebase from 'firebase'
 
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
+  mode: 'history',
   routes: [
+    {
+      path: '*',
+      redirect: '/signin'
+    },
     {
       path: '/',
       name: 'Main',
-      component: Main
+      component: Main,
+      meta: { requiresAuth: true }
     },
     {
       path: '/signup',
@@ -27,7 +34,28 @@ export default new Router({
     {
       path: '/signedit',
       name: 'Signedit',
-      component: Signedit
+      component: Signedit,
+      meta: { requiresAuth: true }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if (requiresAuth) {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        next()
+      } else {
+        next({
+          path: '/signin',
+          query: { redirect: to.fullPath }
+        })
+      }
+    })
+  } else {
+    next()
+  }
+})
+
+export default router

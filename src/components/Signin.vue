@@ -13,7 +13,7 @@
         You can share those texts from anywhere and any of your devices.
       </div>
 
-      <div class="box">
+      <form @submit.prevent="signIn" class="box">
 
         <div class="level">
           <h2 class="level-item title is-4">Sign in</h2>
@@ -24,7 +24,7 @@
             <label class="label">E-mail</label>
           </div>
           <div class="field-body">
-            <input class="input" type="email" placeholder="e-mail" required>
+            <input v-model="email" class="input" type="email" placeholder="e-mail" autofocus required>
           </div>
         </div>
 
@@ -33,22 +33,24 @@
             <label class="label">Password</label>
           </div>
           <div class="field-body">
-            <input class="input" type="password" placeholder="password" required maxlength=20 minlength=6>
+            <input v-model="password" class="input" type="password" placeholder="password" required maxlength=20 minlength=6>
           </div>
         </div>
 
         <div class="is-centered columns">
           <div class="column is-half">
-            <a class="button is-primary is-fullwidth">Sign in</a>
+            <input type="submit" class="button is-primary is-fullwidth" value="Sign in">
           </div>
         </div>
 
-      </div>
+      </form>
 
       <div class="box">
         <div class="is-centered columns">
           <div class="column is-half">
-            <a class="button is-primary is-fullwidth">Sign up</a>
+            <router-link to="/signup" class="button is-primary is-fullwidth">
+              Sign up
+            </router-link>
           </div>
         </div>
       </div>
@@ -58,11 +60,25 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
-  name: 'Signup',
+  name: 'Signin',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      email: '',
+      password: ''
+    }
+  },
+  methods: {
+    signIn () {
+      firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+        .then(user => {
+          this.$router.push('/')
+        })
+        .catch(err => {
+          alert(err.message)
+        })
     }
   }
 }

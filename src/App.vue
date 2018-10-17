@@ -3,12 +3,11 @@
 
     <nav class="navbar is-fixed-top" style="background-color: #eeeeee">
       <div class="navbar-brand">
-        <a class="navbar-item">
+        <router-link to="/" class="navbar-item">
           <img src="http://bulma.io/images/bulma-logo.png" alt="site logo">
-        </a>
+        </router-link>
 
-        <!-- v-if login -->
-        <div class="navbar-item">
+        <div v-if="is_login && $route.path === '/'" class="navbar-item">
           <div class="control has-icon">
             <input id="search-box" class="input" type="search" name="search" placeholder="keywords...">
             <span class="icon is-small">
@@ -17,27 +16,26 @@
           </div>
         </div>
 
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="burgerContent">
+        <a v-if="is_login" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="burgerContent">
           <span></span>
           <span></span>
           <span></span>
         </a>
-        <!-- v-if login end-->
 
       </div>
 
-      <!-- v-if login -->
-      <div id="burgerContent" class="navbar-menu">
+      <div v-if="is_login" id="burgerContent" class="navbar-menu">
         <div class="navbar-end">
           <div class="navbar-item">
-            <a href="#"><i class="fa fa-user-circle fa-2x"></i></a>
+            <router-link to="/signedit">
+              <i class="fa fa-user-circle fa-2x"></i>
+            </router-link>
           </div>
           <div class="navbar-item">
-            <a href="#" class="button is-primary">Sign out</a>
+            <a @click="signOut" class="button is-primary">Sign out</a>
           </div>
         </div>
       </div>
-      <!-- v-if login end  -->
 
     </nav>
 
@@ -55,8 +53,27 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      is_login: false
+    }
+  },
+  methods: {
+    signOut () {
+      firebase.auth().signOut().then(() => {
+        this.$router.push('/signin')
+      })
+    }
+  },
+  created () {
+    firebase.auth().onAuthStateChanged((user) => {
+      this.is_login = (user !== null)
+    })
+  }
 }
 </script>
 

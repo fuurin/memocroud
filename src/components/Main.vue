@@ -4,7 +4,7 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">Welcome to the memocloud!</h1>
-          <h2 class="subtitle">Username</h2>
+          <h2 class="subtitle">{{ username }}</h2>
         </div>
       </div>
     </section>
@@ -107,12 +107,17 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
   name: 'Main',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      username: ''
     }
+  },
+  mounted () {
+    this.username = firebase.auth().currentUser.displayName
   }
 }
 </script>
