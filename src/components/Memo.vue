@@ -2,7 +2,7 @@
   <div class="column is-4" tabindex="0" @keyup.enter="openEdit" @keyup.esc="closeEdit" @keyup.delete="deleteMemo">
     <a v-if="!isEditing" @click="openEdit" class="box">
         <span @click.stop="deleteMemo" class="delete is-pulled-right"></span>
-        <div v-html='memoWithLink' style="word-break: break-all;"></div>
+        <div v-html='memoHtml' style="word-break: break-all;"></div>
         <br><small class="has-text-grey">{{ created }}</small>
     </a>
 
@@ -39,11 +39,13 @@ export default {
     }
   },
   computed: {
-    memoWithLink () {
-      return this.memo.replace(
+    memoHtml () {
+      const memoBreak = this.memo.replace(/\r?\n/g, '<br>')
+      const memoAnchor = memoBreak.replace(
         /((http:|https:)\/\/[\x21-\x26\x28-\x7e]+)/gi,
         "<a class='stop' target='_blank' href='$1' style='z-index:99999'>$1</a>"
       )
+      return memoAnchor
     }
   },
   methods: {
@@ -67,10 +69,11 @@ export default {
           created: moment().format('YYYY/MM/DD HH:mm:ss')
         })
         .then(() => {
-          this.toggleEdit()
+          this.closeEdit()
         })
     },
     deleteMemo () {
+      if (this.isEditing) return
       collection.doc(this.id).delete()
     }
   },

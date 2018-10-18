@@ -56,6 +56,12 @@
           </div>
         </div>
 
+        <div class='is-centered columns'>
+          <div class='column is-half'>
+            <router-link to="/" class='button is-fullwidth'>Back to Sign in</router-link>
+          </div>
+        </div>
+
       </form>
     </div>
   </main>
