@@ -23,7 +23,7 @@
         </form>
 
         <hr/>
-        
+
         <form @submit.prevent="emailEdit" class="columns">
           <div class="field is-horizontal column is-10">
             <div class="field-label is-normal">
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   name: 'Signedit',

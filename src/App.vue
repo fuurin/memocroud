@@ -9,7 +9,7 @@
 
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
           <div class="control has-icon">
-            <input id="search-box" class="input" type="search" name="search" placeholder="keywords...">
+            <input v-model="keyword" id="search-box" class="input" type="search" name="search" placeholder="keywords...">
             <span class="icon is-small">
               <i class="fa fa-search"></i>
             </span>
@@ -39,7 +39,7 @@
 
     </nav>
 
-    <router-view/>
+    <router-view :keyword="keyword"/>
 
     <footer class="footer">
       <div class="container">
@@ -53,13 +53,14 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 
 export default {
   name: 'App',
   data () {
     return {
-      is_login: false
+      is_login: false,
+      keyword: ''
     }
   },
   methods: {
@@ -79,6 +80,7 @@ export default {
 
 <style lang="scss">
 @import "../node_modules/bulma/bulma.sass";
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -11,113 +11,111 @@
 
     <section class="section columns">
 
-      <div class="column is-3">
+      <form @submit.prevent="post" class="column is-3">
         <aside class="box">
           <div class="content">
-            <textarea class="textarea" placeholder="Write your memo!"></textarea>
+            <textarea v-model="memo" @keyup.enter.ctrl="post" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
+            <small class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
           </div>
           <div class="content">
-            <a class="button is-primary is-fullwidth">Post</a>
+            <input type="submit" class="button is-primary is-fullwidth" value="Post">
           </div>
         </aside>
-      </div>
+      </form>
 
       <div class="column">
-
-        <div class="columns">
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-            <div class="card">
-              <div class="card-content">
-                <div class="content">
-                    <textarea class="textarea" placeholder="Write your memo!">Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit</textarea>
-                </div>
-              </div>
-              <footer class="card-footer">
-                <a href="#" class="card-footer-item">Save</a>
-                <a href="#" class="card-footer-item">Cancel</a>
-              </footer>
-            </div>
-          </div>
-        </div>
-
-        <div class="columns">
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-              <a class="box">
-                  <button class="delete is-pulled-right"></button>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                  <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-              </a>
-            </div>
-        </div>
-
-        <div class="columns">
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-            <a class="box">
-                <button class="delete is-pulled-right"></button>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-            </a>
-          </div>
-          <div class="column is-4">
-              <a class="box">
-                  <button class="delete is-pulled-right"></button>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum dolor sit amet, consectetur adipiscing elit
-                  <br><time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-              </a>
-            </div>
+        <div class="columns is-multiline">
+          <memo v-for="memo in displayedMemos" :key="memo.id" :id="memo.id" :memo="memo.memo" :created="memo.created"/>
         </div>
       </div>
+
     </section>
+
   </main>
 </template>
 
 <script>
-import firebase from 'firebase'
+import Memo from './Memo'
+import moment from 'moment'
+import firebase from 'firebase/app'
+import db from './firebaseInit'
+const collection = db.collection('memos')
 
 export default {
   name: 'Main',
+  props: ['keyword'],
+  components: {
+    'memo': Memo
+  },
   data () {
     return {
-      username: ''
+      username: '',
+      memo: '',
+      memos: []
+    }
+  },
+  methods: {
+    post () {
+      const user = firebase.auth().currentUser
+      if (user === null) return
+
+      const memo = this.memo.trim()
+      if (memo === '') return
+
+      this.memo = ''
+      document.getElementById('draft').focus()
+
+      collection.add({
+        memo: memo,
+        created: moment().format('YYYY/MM/DD HH:mm:ss'),
+        uid: user.uid
+      })
+        .then(doc => {
+        })
+        .catch(error => {
+          alert(error)
+        })
+    }
+  },
+  computed: {
+    displayedMemos () {
+      if (this.keyword === '') {
+        return this.memos
+      } else {
+        return this.memos.filter(memo => {
+          const words = this.keyword.split(' ').map(word => `(?=.*${word})`).join('')
+          return memo.memo.match(new RegExp(`^${words}`))
+        })
+      }
     }
   },
   mounted () {
-    this.username = firebase.auth().currentUser.displayName
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) return
+      this.username = user.displayName
+      collection
+        .where('uid', '==', user.uid)
+        .orderBy('created')
+        .onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              let data = change.doc.data()
+              data['id'] = change.doc.id
+              this.memos.unshift(data)
+            }
+            if (change.type === 'modified') {
+              const memo = this.memos.find(memo => memo.id === change.doc.id)
+              memo.memo = change.doc.data().memo
+              memo.created = change.doc.data().created
+            }
+            if (change.type === 'removed') {
+              this.memos = this.memos.filter(memo => memo.id !== change.doc.id)
+            }
+          })
+        }, error => {
+          alert(error)
+        })
+    })
   }
 }
 </script>
