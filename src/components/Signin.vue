@@ -1,9 +1,9 @@
 <template>
-  <main class="section columns">
+  <main class="section columns is-vcentered">
 
     <div class="column is-half">
-      <figure class="image is-4by3">
-        <img src="https://bulma.io/images/placeholders/640x480.png">
+      <figure class="image">
+        <img src="../assets/logo_main_lg.png">
       </figure>
     </div>
 

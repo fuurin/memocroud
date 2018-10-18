@@ -1,10 +1,10 @@
 <template>
   <div id="app" class="has-footer-fixed-bottom">
 
-    <nav class="navbar is-fixed-top" style="background-color: #eeeeee">
+    <nav class="navbar is-fixed-top">
       <div class="navbar-brand">
         <router-link to="/" class="navbar-item">
-          <img src="http://bulma.io/images/bulma-logo.png" alt="site logo">
+          <img id="nav-logo" src="./assets/logo_main_sm.png" alt="site logo">
         </router-link>
 
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
@@ -16,7 +16,7 @@
           </div>
         </div>
 
-        <a v-if="is_login" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="burgerContent">
+        <a v-if="is_login" role="button" class="navbar-burger burger" :class="{ 'is-active': menuActive }" @click="menuToggle" aria-label="menu" aria-expanded="false" data-target="burgerContent">
           <span></span>
           <span></span>
           <span></span>
@@ -24,11 +24,11 @@
 
       </div>
 
-      <div v-if="is_login" id="burgerContent" class="navbar-menu">
+      <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }">
         <div class="navbar-end">
           <div class="navbar-item">
             <router-link to="/signedit">
-              <i class="fa fa-user-circle fa-2x"></i>
+              <i class="fa fa-user-circle fa-2x" style="color: #e4b414"></i>
             </router-link>
           </div>
           <div class="navbar-item">
@@ -59,11 +59,15 @@ export default {
   name: 'App',
   data () {
     return {
+      menuActive: false,
       is_login: false,
       keyword: ''
     }
   },
   methods: {
+    menuToggle () {
+      this.menuActive = !this.menuActive
+    },
     signOut () {
       firebase.auth().signOut().then(() => {
         this.$router.push('/signin')
@@ -79,6 +83,13 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../node_modules/bulma/sass/utilities/initial-variables";
+@import "../node_modules/bulma/sass/utilities/functions";
+
+$primary: #e4b414;
+$footer-background-color: ivory;
+
+// customize bulma over here
 @import "../node_modules/bulma/bulma.sass";
 
 #app {
@@ -87,6 +98,14 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin-top: 50px;
+}
+
+.navbar {
+  background-color: ivory;
+}
+
+#nav-logo {
+  max-height: 42px;
 }
 
 .has-footer-fixed-bottom {

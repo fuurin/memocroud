@@ -18,7 +18,7 @@
             </div>
           </div>
           <div class="column">
-            <input type="submit" class="button is-info" value="Modify">
+            <input type="submit" class="button is-primary" value="Modify">
           </div>
         </form>
 
@@ -34,7 +34,7 @@
             </div>
           </div>
           <div class="column">
-            <input type="submit" class="button is-info" value="Modify">
+            <input type="submit" class="button is-primary" value="Modify">
           </div>
         </form>
 
@@ -61,7 +61,7 @@
             </div>
           </div>
           <div class="column is-vcentered">
-            <input type="submit" class="button is-info" value="Modify">
+            <input type="submit" class="button is-primary" value="Modify">
           </div>
         </form>
 
