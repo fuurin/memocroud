@@ -7,15 +7,6 @@
           <img id="nav-logo" src="./assets/logo_main_sm.png" alt="site logo">
         </router-link>
 
-        <div v-if="is_login && $route.path === '/'" class="navbar-item">
-          <div class="control has-icon">
-            <input v-model="keyword" id="search-box" class="input" type="search" name="search" placeholder="keywords...">
-            <span class="icon is-small">
-              <i class="fa fa-search"></i>
-            </span>
-          </div>
-        </div>
-
         <a v-if="is_login" role="button" class="navbar-burger burger" :class="{ 'is-active': menuActive }" @click="menuToggle" aria-label="menu" aria-expanded="false" data-target="burgerContent">
           <span></span>
           <span></span>
@@ -25,6 +16,14 @@
       </div>
 
       <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }">
+        <div v-if="is_login && $route.path === '/'" class="navbar-item">
+          <div class="control has-icon">
+            <input v-model="keyword" id="search-box" class="input" type="search" name="search" placeholder="keywords...">
+            <span class="icon is-small">
+              <i class="fa fa-search"></i>
+            </span>
+          </div>
+        </div>
         <div class="navbar-end">
           <div class="navbar-item">
             <router-link to="/signedit">
