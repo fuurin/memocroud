@@ -1,6 +1,5 @@
 <template>
   <div id="app" class="has-footer-fixed-bottom">
-
     <nav class="navbar is-fixed-top">
       <div class="navbar-brand">
         <router-link to="/" class="navbar-item">
@@ -15,10 +14,10 @@
 
       </div>
 
-      <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }">
+      <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }" @click="menuClose">
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
           <div class="control has-icon">
-            <input v-model="keyword" id="search-box" class="input" type="search" name="search" placeholder="keywords...">
+            <input v-model="keyword" id="search-box" class="input stop" type="search" name="search" placeholder="keywords...">
             <span class="icon is-small">
               <i class="fa fa-search"></i>
             </span>
@@ -38,7 +37,9 @@
 
     </nav>
 
-    <router-view :keyword="keyword"/>
+    <div @click="menuClose">
+      <router-view :keyword="keyword"/>
+    </div>
 
     <footer class="footer">
       <div class="container">
@@ -67,6 +68,9 @@ export default {
     menuToggle () {
       this.menuActive = !this.menuActive
     },
+    menuClose () {
+      this.menuActive = false
+    },
     signOut () {
       firebase.auth().signOut().then(() => {
         this.$router.push('/signin')
@@ -76,6 +80,13 @@ export default {
   created () {
     firebase.auth().onAuthStateChanged((user) => {
       this.is_login = (user !== null)
+    })
+  },
+  mounted () {
+    [].forEach.call(document.getElementsByClassName('stop'), dom => {
+      dom.addEventListener('click', ev => {
+        ev.stopPropagation()
+      })
     })
   }
 }

@@ -1,5 +1,7 @@
 <template>
   <main>
+    <div id="top"></div>
+
     <section class="hero is-primary">
       <div class="hero-body">
         <div class="container">
@@ -31,6 +33,8 @@
 
     </section>
 
+    <a href="#" id="return-top" v-scroll-to="'#top'">▲</a>
+
   </main>
 </template>
 
@@ -40,6 +44,7 @@ import moment from 'moment'
 import firebase from 'firebase/app'
 import db from './firebaseInit'
 const collection = db.collection('memos')
+const MEMOS_PER_PAGE = 9
 
 export default {
   name: 'Main',
@@ -51,7 +56,9 @@ export default {
     return {
       username: '',
       memo: '',
-      memos: []
+      memos: [],
+      displayNum: MEMOS_PER_PAGE,
+      scrollY: 0
     }
   },
   methods: {
@@ -75,21 +82,31 @@ export default {
         .catch(error => {
           alert(error)
         })
+    },
+    showMore () {
+      this.displayNum += MEMOS_PER_PAGE
     }
   },
   computed: {
     displayedMemos () {
+      let memos = []
       if (this.keyword === '') {
-        return this.memos
+        memos = this.memos
       } else {
-        return this.memos.filter(memo => {
+        memos = this.memos.filter(memo => {
           const words = this.keyword.split(' ').map(word => `(?=.*${word})`).join('')
           return memo.memo.match(new RegExp(`^${words}`))
         })
       }
+
+      return memos.slice(0, this.displayNum)
     }
   },
   mounted () {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > document.body.clientHeight - window.innerHeight) this.showMore()
+    })
+
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return
       this.username = user.displayName
@@ -122,4 +139,23 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  #return-top {
+    background-color: #e4b414;
+    border-radius: 50%;
+    bottom: 50px;
+    color: #fff;
+    font-size:20px;
+    height: 50px;
+    line-height: 50px;
+    outline: 0;
+    position: fixed;
+    right: 50px;
+    text-align: center;
+    width: 50px;
+  }
+
+  #top {
+    position: absolute;
+    top: -100px;
+  }
 </style>
