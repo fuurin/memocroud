@@ -4,7 +4,8 @@ import Main from '@/components/Main'
 import Signup from '@/components/Signup'
 import Signin from '@/components/Signin'
 import Signedit from '@/components/Signedit'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
 
 Vue.use(Router)
 
