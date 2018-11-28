@@ -15,7 +15,7 @@
       </div>
       <footer class="card-footer">
         <a @click="editMemo" class="card-footer-item">Save</a>
-        <div @click="speech" class="card-footer-item" :class="{ 'has-background-danger': isRecording }">
+        <div @click="speech" class="card-footer-item" :class="{ 'has-background-danger': isRecording }" style="cursor: pointer">
           <i class="fas fa-microphone"></i>
         </div>
         <a @click="closeEdit" class="card-footer-item">Cancel</a>
@@ -31,7 +31,7 @@ import { setTimeout } from 'timers'
 
 export default {
   name: 'Memo',
-  props: ['id', 'memo', 'created', 'collection', 'SpeechToText'],
+  props: ['id', 'memo', 'created', 'collection', 'SpeechToText', 'speechLang'],
   data () {
     return {
       isEditing: false,
@@ -107,7 +107,7 @@ export default {
       }
 
       try {
-        this.listener = new this.SpeechToText(onSpeechFinished, onSpeechDetected, 'ja')
+        this.listener = new this.SpeechToText(onSpeechFinished, onSpeechDetected, this.speechLang)
         this.listener.startListening()
       } catch (error) {
         alert(error)

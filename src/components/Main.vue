@@ -40,7 +40,8 @@
             :memo="memo.memo"
             :created="memo.created"
             :collection="collection"
-            :SpeechToText="SpeechToText"/>
+            :SpeechToText="SpeechToText"
+            :speechLang="speechLang"/>
         </div>
       </div>
 
@@ -72,7 +73,6 @@ export default {
       memo: '',
       memos: [],
       displayNum: MEMOS_PER_PAGE,
-      scrollY: 0,
       isRecording: false,
       listener: null,
       SpeechToText: SpeechToText,
