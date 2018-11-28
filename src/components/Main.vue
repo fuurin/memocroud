@@ -86,6 +86,8 @@ export default {
       const memo = this.memo.trim()
       if (memo === '') return
 
+      this.stopSpeech()
+
       this.memo = ''
       document.getElementById('draft').focus()
 
@@ -102,14 +104,18 @@ export default {
     showMore () {
       this.displayNum += MEMOS_PER_PAGE
     },
-    speech () {
+    stopSpeech () {
       if (this.isRecording) {
         if (this.listener !== null) {
           this.listener.stopListening()
         }
         this.isRecording = false
-        return
+        return true
       }
+      return false
+    },
+    speech () {
+      if (this.stopSpeech()) return
 
       this.isRecording = true
 
@@ -122,13 +128,13 @@ export default {
       const originalMemo = this.memo
 
       const onSpeechFinished = (text) => {
-        this.memo = (originalMemo + '\n' + text).trim()
-        this.isRecording = false
         this.listener.stopListening()
+        if (this.isRecording) this.memo = (originalMemo + '\n' + text).trim()
+        this.isRecording = false
       }
 
       const onSpeechDetected = (text) => {
-        this.memo = (originalMemo + '\n' + text).trim()
+        if (this.isRecording) this.memo = (originalMemo + '\n' + text).trim()
       }
 
       try {

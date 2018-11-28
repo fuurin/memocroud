@@ -89,6 +89,7 @@
 
 <script>
 import firebase from 'firebase/app'
+import db from './firebaseInit'
 
 export default {
   name: 'Signedit',
@@ -144,11 +145,18 @@ export default {
     deleteAccount () {
       if (confirm('Are you really sure deleting your account? You cannot restore the data.')) {
         var user = firebase.auth().currentUser
-        user.delete().then(() => {
-          this.$router.push('/signin')
-        }).catch((error) => {
-          alert(error)
-        })
+        db.collection('users').doc(user.uid).delete()
+          .then(() => {
+            user.delete().then(() => {
+              alert('Account deleted: ' + this.username)
+              this.$router.push('/signin')
+            }).catch((error) => {
+              alert(error)
+            })
+          })
+          .catch((error) => {
+            alert(error)
+          })
       }
     }
   },

@@ -52,7 +52,7 @@
 
         <div class='is-centered columns'>
           <div class='column is-half'>
-            <input type="submit" class='button is-primary is-fullwidth' value="Finish">
+            <button type="submit" class='button is-primary is-fullwidth' :class="{'is-loading': isSigningUp}">Finish</button>
           </div>
         </div>
 
@@ -77,7 +77,8 @@ export default {
       username: '',
       email: '',
       password: '',
-      confirm: ''
+      confirm: '',
+      isSigningUp: false
     }
   },
   methods: {
@@ -92,6 +93,8 @@ export default {
         return
       }
 
+      this.isSigningUp = true
+
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(user => {
           const currentUser = user.user
@@ -99,14 +102,17 @@ export default {
             displayName: this.username
           })
             .then(() => {
+              this.isSigningUp = false
               alert('Create account: ' + currentUser.displayName)
               this.$router.push('/')
             })
             .catch(error => {
+              this.isSigningUp = false
               alert(error.message)
             })
         })
         .catch(error => {
+          this.isSigningUp = false
           alert(error.message)
         })
     }

@@ -62,8 +62,10 @@ export default {
     },
     closeEdit () {
       this.isEditing = false
+      this.stopSpeech()
     },
     editMemo () {
+      this.stopSpeech()
       this.collection.doc(this.id)
         .set({
           memo: this.draft,
@@ -77,14 +79,18 @@ export default {
       if (this.isEditing) return
       this.collection.doc(this.id).delete()
     },
-    speech () {
+    stopSpeech () {
       if (this.isRecording) {
         if (this.listener !== null) {
           this.listener.stopListening()
         }
         this.isRecording = false
-        return
+        return true
       }
+      return false
+    },
+    speech () {
+      if (this.stopSpeech()) return
 
       this.isRecording = true
 
@@ -97,13 +103,13 @@ export default {
       const originalDraft = this.draft
 
       const onSpeechFinished = (text) => {
-        this.memo = (originalDraft + '\n' + text).trim()
-        this.isRecording = false
         this.listener.stopListening()
+        if (this.isRecording) this.draft = (originalDraft + '\n' + text).trim()
+        this.isRecording = false
       }
 
       const onSpeechDetected = (text) => {
-        this.draft = (originalDraft + '\n' + text).trim()
+        if (this.isRecording) this.draft = (originalDraft + '\n' + text).trim()
       }
 
       try {
