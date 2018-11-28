@@ -46,6 +46,8 @@ import db from './firebaseInit'
 const collection = db.collection('memos')
 const MEMOS_PER_PAGE = 9
 
+var start = null
+
 export default {
   name: 'Main',
   props: ['keyword'],
@@ -87,26 +89,9 @@ export default {
       this.displayNum += MEMOS_PER_PAGE
     }
   },
-  computed: {
-    displayedMemos () {
-      let memos = []
-      if (this.keyword === '') {
-        memos = this.memos
-      } else {
-        memos = this.memos.filter(memo => {
-          const words = this.keyword.split(' ').map(word => `(?=.*${word})`).join('')
-          return memo.memo.match(new RegExp(`^${words}`))
-        })
-      }
 
-      return memos.slice(0, this.displayNum)
-    }
-  },
-  mounted () {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > document.body.clientHeight - window.innerHeight) this.showMore()
-    })
-
+  created () {
+    start = new Date()
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return
       this.username = user.displayName
@@ -133,6 +118,30 @@ export default {
           alert(error)
         })
     })
+  },
+
+  computed: {
+    displayedMemos () {
+      let memos = []
+      if (this.keyword === '') {
+        memos = this.memos
+      } else {
+        memos = this.memos.filter(memo => {
+          const words = this.keyword.split(' ').map(word => `(?=.*${word})`).join('')
+          return memo.memo.match(new RegExp(`^${words}`))
+        })
+      }
+
+      return memos.slice(0, this.displayNum)
+    }
+  },
+
+  mounted () {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > document.body.clientHeight - window.innerHeight - 100) this.showMore()
+    })
+
+    console.log(new Date().getTime() - start.getTime())
   }
 }
 </script>
