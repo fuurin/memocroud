@@ -9,7 +9,6 @@ import firebase from 'firebase'
 Vue.use(Router)
 
 var VueScrollTo = require('vue-scrollto')
-
 Vue.use(VueScrollTo)
 
 // You can also pass in the default options
@@ -26,6 +25,9 @@ Vue.use(VueScrollTo, {
   x: false,
   y: true
 })
+
+// Vue.config.devtools = true
+// Vue.config.performance = true
 
 let router = new Router({
   mode: 'history',
