@@ -15,6 +15,9 @@
       </div>
       <footer class="card-footer">
         <a @click="editMemo" class="card-footer-item">Save</a>
+        <div @click="speech" class="card-footer-item" :class="{ 'has-background-danger': isRecording }">
+          <i class="fas fa-microphone"></i>
+        </div>
         <a @click="closeEdit" class="card-footer-item">Cancel</a>
       </footer>
     </div>
@@ -24,18 +27,17 @@
 
 <script>
 import moment from 'moment'
-import firebase from 'firebase'
-import db from './firebaseInit'
 import { setTimeout } from 'timers'
-const collection = db.collection('memos')
 
 export default {
   name: 'Memo',
-  props: ['id', 'memo', 'created'],
+  props: ['id', 'memo', 'created', 'uid', 'collection', 'SpeechToText'],
   data () {
     return {
       isEditing: false,
-      draft: this.memo
+      draft: this.memo,
+      isRecording: false,
+      listener: null
     }
   },
   computed: {
@@ -62,9 +64,9 @@ export default {
       this.isEditing = false
     },
     editMemo () {
-      collection.doc(this.id)
+      this.collection.doc(this.id)
         .set({
-          uid: firebase.auth().currentUser.uid,
+          uid: this.uid,
           memo: this.draft,
           created: moment().format('YYYY/MM/DD HH:mm:ss')
         })
@@ -74,7 +76,43 @@ export default {
     },
     deleteMemo () {
       if (this.isEditing) return
-      collection.doc(this.id).delete()
+      this.collection.doc(this.id).delete()
+    },
+    speech () {
+      if (this.isRecording) {
+        if (this.listener !== null) {
+          this.listener.stopListening()
+        }
+        this.isRecording = false
+        return
+      }
+
+      this.isRecording = true
+
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('Your brouser doesn\'t support speech recognitin. Please Try Google Chrome browser.')
+        this.isRecording = false
+        return
+      }
+
+      const originalDraft = this.draft
+
+      const onSpeechFinished = (text) => {
+        this.memo = (originalDraft + '\n' + text).trim()
+        this.isRecording = false
+        this.listener.stopListening()
+      }
+
+      const onSpeechDetected = (text) => {
+        this.draft = (originalDraft + '\n' + text).trim()
+      }
+
+      try {
+        this.listener = new this.SpeechToText(onSpeechFinished, onSpeechDetected, 'ja')
+        this.listener.startListening()
+      } catch (error) {
+        alert(error)
+      }
     }
   },
   mounted () {

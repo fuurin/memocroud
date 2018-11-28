@@ -17,6 +17,7 @@
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "firebase": "^5.5.4",
     "moment": "^2.22.2",
+    "speech-to-text": "^1.1.0",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vue-scrollto": "^2.13.0"

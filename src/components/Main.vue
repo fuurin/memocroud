@@ -19,15 +19,29 @@
             <textarea v-model="memo" @keyup.enter.ctrl="post" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
             <small class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
           </div>
-          <div class="content">
-            <input type="submit" class="button is-primary is-fullwidth" value="Post">
+          <div class="content columns is-mobile" style="margin-top: 0px;">
+            <div class="column is-9">
+              <input type="submit" class="button is-primary is-fullwidth" value="Post">
+            </div>
+            <div class="column">
+              <div class="button is-fullwidth" :class="{ 'is-danger': isRecording }" @click="speech">
+                <i class="fas fa-microphone"></i>
+              </div>
+            </div>
           </div>
         </aside>
       </form>
 
       <div class="column">
         <div class="columns is-multiline">
-          <memo v-for="memo in displayedMemos" :key="memo.id" :id="memo.id" :memo="memo.memo" :created="memo.created"/>
+          <memo v-for="memo in displayedMemos"
+            :key="memo.id"
+            :id="memo.id"
+            :memo="memo.memo"
+            :uid='uid'
+            :created="memo.created"
+            :collection="collection"
+            :SpeechToText="SpeechToText"/>
         </div>
       </div>
 
@@ -43,30 +57,33 @@ import Memo from './Memo'
 import moment from 'moment'
 import firebase from 'firebase/app'
 import db from './firebaseInit'
+import SpeechToText from 'speech-to-text'
 const collection = db.collection('memos')
 const MEMOS_PER_PAGE = 9
 
-var start = null
-
 export default {
   name: 'Main',
-  props: ['keyword'],
+  props: ['keyword', 'speechLang'],
   components: {
     'memo': Memo
   },
   data () {
     return {
       username: '',
+      uid: '',
       memo: '',
       memos: [],
       displayNum: MEMOS_PER_PAGE,
-      scrollY: 0
+      scrollY: 0,
+      isRecording: false,
+      listener: null,
+      SpeechToText: SpeechToText,
+      collection: collection
     }
   },
   methods: {
     post () {
-      const user = firebase.auth().currentUser
-      if (user === null) return
+      if (this.uid === '') return
 
       const memo = this.memo.trim()
       if (memo === '') return
@@ -77,7 +94,7 @@ export default {
       collection.add({
         memo: memo,
         created: moment().format('YYYY/MM/DD HH:mm:ss'),
-        uid: user.uid
+        uid: this.uid
       })
         .then(doc => {
         })
@@ -87,15 +104,51 @@ export default {
     },
     showMore () {
       this.displayNum += MEMOS_PER_PAGE
+    },
+    speech () {
+      if (this.isRecording) {
+        if (this.listener !== null) {
+          this.listener.stopListening()
+        }
+        this.isRecording = false
+        return
+      }
+
+      this.isRecording = true
+
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('Your brouser doesn\'t support speech recognitin. Please Try Google Chrome browser.')
+        this.isRecording = false
+        return
+      }
+
+      const originalMemo = this.memo
+
+      const onSpeechFinished = (text) => {
+        this.memo = (originalMemo + '\n' + text).trim()
+        this.isRecording = false
+        this.listener.stopListening()
+      }
+
+      const onSpeechDetected = (text) => {
+        this.memo = (originalMemo + '\n' + text).trim()
+      }
+
+      try {
+        this.listener = new this.SpeechToText(onSpeechFinished, onSpeechDetected, this.speechLang)
+        this.listener.startListening()
+      } catch (error) {
+        alert(error)
+      }
     }
   },
 
   created () {
-    start = new Date()
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return
       this.username = user.displayName
-      collection
+      this.uid = user.uid
+      this.collection
         .where('uid', '==', user.uid)
         .orderBy('created')
         .onSnapshot(snapshot => {
@@ -140,8 +193,6 @@ export default {
     window.addEventListener('scroll', () => {
       if (window.scrollY > document.body.clientHeight - window.innerHeight - 100) this.showMore()
     })
-
-    console.log(new Date().getTime() - start.getTime())
   }
 }
 </script>

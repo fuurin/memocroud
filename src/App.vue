@@ -23,6 +23,19 @@
             </span>
           </div>
         </div>
+        <div v-if="is_login && $route.path === '/'" class="navbar-item">
+          <div class="control has-icons-left">
+            <div class="select">
+              <select v-model="speechLang">
+                <option value="ja" selected="true">Japanese</option>
+                <option value="en-US">English</option>
+              </select>
+            </div>
+            <div class="icon is-small is-left">
+              <i class="fas fa-microphone"></i>
+            </div>
+          </div>
+        </div>
         <div class="navbar-end">
           <div class="navbar-item">
             <router-link to="/signedit">
@@ -38,7 +51,7 @@
     </nav>
 
     <div @click="menuClose">
-      <router-view :keyword="keyword"/>
+      <router-view :keyword="keyword" :speechLang="speechLang"/>
     </div>
 
     <footer class="footer">
@@ -61,7 +74,8 @@ export default {
     return {
       menuActive: false,
       is_login: false,
-      keyword: ''
+      keyword: '',
+      speechLang: 'ja'
     }
   },
   methods: {
