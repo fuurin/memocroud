@@ -38,7 +38,6 @@
             :key="memo.id"
             :id="memo.id"
             :memo="memo.memo"
-            :uid='uid'
             :created="memo.created"
             :collection="collection"
             :SpeechToText="SpeechToText"/>
@@ -58,7 +57,6 @@ import moment from 'moment'
 import firebase from 'firebase/app'
 import db from './firebaseInit'
 import SpeechToText from 'speech-to-text'
-const collection = db.collection('memos')
 const MEMOS_PER_PAGE = 9
 
 export default {
@@ -78,7 +76,7 @@ export default {
       isRecording: false,
       listener: null,
       SpeechToText: SpeechToText,
-      collection: collection
+      collection: null
     }
   },
   methods: {
@@ -91,10 +89,9 @@ export default {
       this.memo = ''
       document.getElementById('draft').focus()
 
-      collection.add({
+      this.collection.add({
         memo: memo,
-        created: moment().format('YYYY/MM/DD HH:mm:ss'),
-        uid: this.uid
+        created: moment().format('YYYY/MM/DD HH:mm:ss')
       })
         .then(doc => {
         })
@@ -148,8 +145,8 @@ export default {
       if (!user) return
       this.username = user.displayName
       this.uid = user.uid
+      this.collection = db.collection('users').doc(this.uid).collection('memos')
       this.collection
-        .where('uid', '==', user.uid)
         .orderBy('created')
         .onSnapshot(snapshot => {
           snapshot.docChanges().forEach(change => {

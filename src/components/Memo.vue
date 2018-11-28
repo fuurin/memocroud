@@ -31,7 +31,7 @@ import { setTimeout } from 'timers'
 
 export default {
   name: 'Memo',
-  props: ['id', 'memo', 'created', 'uid', 'collection', 'SpeechToText'],
+  props: ['id', 'memo', 'created', 'collection', 'SpeechToText'],
   data () {
     return {
       isEditing: false,
@@ -66,7 +66,6 @@ export default {
     editMemo () {
       this.collection.doc(this.id)
         .set({
-          uid: this.uid,
           memo: this.draft,
           created: moment().format('YYYY/MM/DD HH:mm:ss')
         })
