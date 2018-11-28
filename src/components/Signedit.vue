@@ -134,7 +134,7 @@ export default {
       }
 
       const user = firebase.auth().currentUser
-      user.updateEmail(this.email)
+      user.updatePassword(this.password)
         .then(() => {
           alert('Password updated')
         })
@@ -145,6 +145,15 @@ export default {
     deleteAccount () {
       if (confirm('Are you really sure deleting your account? You cannot restore the data.')) {
         var user = firebase.auth().currentUser
+
+        db.collection('users').doc(user.uid).collection('memos').onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              db.collection('users').doc(user.uid).collection('memos').doc(change.doc.id).delete()
+            }
+          })
+        })
+
         db.collection('users').doc(user.uid).delete()
           .then(() => {
             user.delete().then(() => {
