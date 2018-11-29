@@ -17,9 +17,9 @@
         <aside class="box">
           <div class="content">
             <textarea v-model="memo" @keyup.enter.ctrl="post" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
-            <small class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
+            <small v-if="!isMobile()" class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
           </div>
-          <div class="content columns is-mobile" style="margin-top: 0px;">
+          <div class="content columns" style="margin-top: 0px;">
             <div class="column is-9">
               <input type="submit" class="button is-primary is-fullwidth" value="Post">
             </div>
@@ -47,7 +47,9 @@
 
     </section>
 
-    <a href="#" id="return-top" v-scroll-to="'#top'">▲</a>
+    <transition name="fade">
+      <a href="#" id="return-top" v-show="showTopButton" v-scroll-to="'#top'">▲</a>
+    </transition>
 
   </main>
 </template>
@@ -55,10 +57,14 @@
 <script>
 import Memo from './Memo'
 import moment from 'moment'
+import isMobile from 'ismobilejs'
 import firebase from 'firebase/app'
 import db from './firebaseInit'
 import SpeechToText from 'speech-to-text'
 const MEMOS_PER_PAGE = 9
+const SHOW_TOP_BUTTON_PERIOD = 1000
+
+var showTopButtonTimer = null
 
 export default {
   name: 'Main',
@@ -76,7 +82,8 @@ export default {
       isRecording: false,
       listener: null,
       SpeechToText: SpeechToText,
-      collection: null
+      collection: null,
+      showTopButton: false
     }
   },
   methods: {
@@ -143,6 +150,9 @@ export default {
       } catch (error) {
         alert(error)
       }
+    },
+    isMobile () {
+      return isMobile.any
     }
   },
 
@@ -194,6 +204,12 @@ export default {
 
   mounted () {
     window.addEventListener('scroll', () => {
+      this.showTopButton = true
+      if (showTopButtonTimer !== null) clearTimeout(showTopButtonTimer)
+      showTopButtonTimer = setTimeout(() => {
+        this.showTopButton = false
+        showTopButtonTimer = null
+      }, SHOW_TOP_BUTTON_PERIOD)
       if (window.scrollY > document.body.clientHeight - window.innerHeight - 100) this.showMore()
     })
   }
@@ -219,6 +235,13 @@ export default {
 
   #top {
     position: absolute;
-    top: -100px;
+    top: -1000px;
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
   }
 </style>

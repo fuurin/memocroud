@@ -10,7 +10,7 @@
       <div class="card-content">
         <div class="content">
           <textarea v-model="draft" @keyup.enter.ctrl="editMemo" :id="'draft_' + id" class="textarea" placeholder="Write your memo!"></textarea>
-          <small class="is-pulled-right has-text-grey-light">ctrl + Enter to save</small>
+          <small v-if="!isMobile()" class="is-pulled-right has-text-grey-light">ctrl + Enter to save</small>
         </div>
       </div>
       <footer class="card-footer">
@@ -27,6 +27,7 @@
 
 <script>
 import moment from 'moment'
+import isMobile from 'ismobilejs'
 import { setTimeout } from 'timers'
 
 export default {
@@ -118,6 +119,9 @@ export default {
       } catch (error) {
         alert(error)
       }
+    },
+    isMobile () {
+      return isMobile.any
     }
   },
   mounted () {
