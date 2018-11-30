@@ -14,7 +14,7 @@
     <section class="section columns">
 
       <form @submit.prevent="post" class="column is-3">
-        <aside class="box">
+        <aside class="box" :class="{'sticky': !isMobile()}">
           <div class="content">
             <textarea v-model="memo" @keyup.enter.ctrl="post" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
             <small v-if="!isMobile()" class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
@@ -106,7 +106,7 @@ export default {
       this.stopSpeech()
 
       this.memo = ''
-      this.$el.querySelector('#draft').focus()
+      if (!this.isMobile()) this.$el.querySelector('#draft').focus()
 
       this.collection.add({
         memo: memo,
@@ -271,4 +271,11 @@ export default {
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
+
+.sticky {
+  position: -webkit-sticky; /* safari対応 */
+  position: sticky;
+  top: 85px;
+}
+
 </style>
