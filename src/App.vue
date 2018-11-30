@@ -27,6 +27,12 @@
           </div>
         </div>
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
+          <div class="button" :class="{ 'is-danger': isRecording }" @click="speech">
+            <i class="fa fa-search"></i>
+            <i class="fas fa-microphone"></i>
+          </div>
+        </div>
+        <div v-if="is_login && $route.path === '/'" class="navbar-item">
           <div class="control has-icons-left">
             <div class="select">
               <select v-model="speechLang">
@@ -74,6 +80,15 @@
 
 <script>
 import firebase from 'firebase/app'
+import SpeechToText from 'speech-to-text'
+
+function modifySpeechText (text) {
+  text = text.replace(/(改行|ブレイク|ブレーク|break )/g, '\n')
+  text = text.replace(/(空白|スペース|space )/g, ' ')
+  text = text.replace(/(シャープ|タグ|sharp |tag )/g, '#')
+  text = text.replace(/([^ \n])#/gi, '$1 #')
+  return text
+}
 
 export default {
   name: 'App',
@@ -82,7 +97,10 @@ export default {
       menuActive: false,
       is_login: false,
       keyword: '',
-      speechLang: 'ja'
+      speechLang: 'ja',
+      isRecording: false,
+      listener: null,
+      SpeechToText: SpeechToText
     }
   },
   methods: {
@@ -102,6 +120,46 @@ export default {
     },
     clearKeyword () {
       this.keyword = ''
+    },
+    stopSpeech () {
+      if (this.isRecording) {
+        if (this.listener !== null) {
+          this.listener.stopListening()
+        }
+        this.isRecording = false
+        return true
+      }
+      return false
+    },
+    speech () {
+      if (this.stopSpeech()) return
+
+      this.isRecording = true
+
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('Your brouser doesn\'t support speech recognitin. Please Try Google Chrome browser.')
+        this.isRecording = false
+        return
+      }
+
+      const onSpeechFinished = (text) => {
+        if (!this.isRecording) return
+        this.listener.stopListening()
+        this.isRecording = false
+        this.keyword = modifySpeechText(text).trim()
+      }
+
+      const onSpeechDetected = (text) => {
+        if (!this.isRecording) return
+        this.keyword = modifySpeechText(text).trim()
+      }
+
+      try {
+        this.listener = new this.SpeechToText(onSpeechFinished, onSpeechDetected, this.speechLang)
+        this.listener.startListening()
+      } catch (error) {
+        alert(error)
+      }
     }
   },
   created () {

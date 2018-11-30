@@ -32,6 +32,7 @@ import { setTimeout } from 'timers'
 
 function modifySpeechText (text) {
   text = text.replace(/(改行|ブレイク|ブレーク|break )/g, '\n')
+  text = text.replace(/(空白|スペース|space )/g, ' ')
   text = text.replace(/(シャープ|タグ|sharp |tag )/g, '#')
   text = text.replace(/([^ \n])#/gi, '$1 #')
   return text
@@ -128,8 +129,8 @@ export default {
         if (!this.isRecording) return
         this.listener.stopListening()
         this.isRecording = false
-        text = modifySpeechText(text)
-        this.draft = (originalDraft + '\n' + text).trim()
+        const modifiedText = modifySpeechText(text)
+        this.draft = (originalDraft + '\n' + modifiedText).trim()
       }
 
       const onSpeechDetected = (text) => {
