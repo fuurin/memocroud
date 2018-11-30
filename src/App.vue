@@ -1,12 +1,12 @@
 <template>
   <div id="app" class="has-footer-fixed-bottom">
     <nav class="navbar is-fixed-top">
-      <div class="navbar-brand">
+      <div class="navbar-brand" @click.stop="menuToggle">
         <router-link to="/" class="navbar-item">
           <img id="nav-logo" src="./assets/logo_main_sm.png" alt="site logo">
         </router-link>
 
-        <a v-if="is_login" role="button" class="navbar-burger burger" :class="{ 'is-active': menuActive }" @click="menuToggle" aria-label="menu" aria-expanded="false" data-target="burgerContent">
+        <a v-if="is_login" role="button" class="navbar-burger burger" :class="{ 'is-active': menuActive }" aria-label="menu" aria-expanded="false" data-target="burgerContent">
           <span></span>
           <span></span>
           <span></span>
@@ -14,10 +14,10 @@
 
       </div>
 
-      <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }" @click="menuClose">
+      <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }">
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
           <div class="control has-icons-left has-icons-right">
-            <input v-model="keyword" id="search-box" class="input stop" type="search" name="search" placeholder="keywords...">
+            <input v-model="keyword" id="search-box" class="input" type="search" name="search" placeholder="keywords...">
             <span class="icon is-small is-left">
               <i class="fa fa-search"></i>
             </span>
