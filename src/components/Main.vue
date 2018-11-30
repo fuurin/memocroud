@@ -35,6 +35,7 @@
       <div class="column">
         <div class="columns is-multiline">
           <memo v-for="memo in displayedMemos"
+            @search-tag="searchTag"
             :key="memo.id"
             :id="memo.id"
             :memo="memo.memo"
@@ -61,6 +62,7 @@ import isMobile from 'ismobilejs'
 import firebase from 'firebase/app'
 import db from './firebaseInit'
 import SpeechToText from 'speech-to-text'
+import { setTimeout } from 'timers'
 const MEMOS_PER_PAGE = 9
 const SHOW_TOP_BUTTON_PERIOD = 1000
 
@@ -96,7 +98,7 @@ export default {
       this.stopSpeech()
 
       this.memo = ''
-      document.getElementById('draft').focus()
+      this.$el.querySelector('#draft').focus()
 
       this.collection.add({
         memo: memo,
@@ -151,6 +153,9 @@ export default {
         alert(error)
       }
     },
+    searchTag (tag) {
+      this.$emit('search-tag', tag)
+    },
     isMobile () {
       return isMobile.any
     }
@@ -189,12 +194,19 @@ export default {
   computed: {
     displayedMemos () {
       let memos = []
+
       if (this.keyword === '') {
         memos = this.memos
       } else {
+        const words = this.keyword.split(' ').filter(word => word.length > 0)
         memos = this.memos.filter(memo => {
-          const words = this.keyword.split(' ').map(word => `(?=.*${word})`).join('')
-          return memo.memo.match(new RegExp(`^${words}`))
+          const m = memo.memo
+          return words.every(word => {
+            if (word[0] === '#' && word.length > 1) {
+              return m.includes(word + ' ') || m.includes(word + '\n') || m.endsWith(word)
+            }
+            return m.includes(word)
+          })
         })
       }
 
@@ -212,6 +224,9 @@ export default {
       }, SHOW_TOP_BUTTON_PERIOD)
       if (window.scrollY > document.body.clientHeight - window.innerHeight - 100) this.showMore()
     })
+    setTimeout(() => {
+      this.$el.querySelector('#draft').focus()
+    }, 1)
   }
 }
 </script>

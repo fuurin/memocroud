@@ -16,11 +16,14 @@
 
       <div v-if="is_login" id="burgerContent" class="navbar-menu" :class="{ 'is-active': menuActive }" @click="menuClose">
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
-          <div class="control has-icon">
+          <div class="control has-icons-left has-icons-right">
             <input v-model="keyword" id="search-box" class="input stop" type="search" name="search" placeholder="keywords...">
-            <span class="icon is-small">
+            <span class="icon is-small is-left">
               <i class="fa fa-search"></i>
             </span>
+            <a @click="clearKeyword" class="icon is-small is-right" style="pointer-events: initial; cursor: pointer;">
+              <i class="fas fa-times"></i>
+            </a>
           </div>
         </div>
         <div v-if="is_login && $route.path === '/'" class="navbar-item">
@@ -51,7 +54,11 @@
     </nav>
 
     <div @click="menuClose">
-      <router-view :keyword="keyword" :speechLang="speechLang"/>
+      <router-view
+        @search-tag="searchTag"
+        :keyword="keyword"
+        :speechLang="speechLang"
+      />
     </div>
 
     <footer class="footer">
@@ -89,6 +96,12 @@ export default {
       firebase.auth().signOut().then(() => {
         this.$router.push('/signin')
       })
+    },
+    searchTag (tag) {
+      this.keyword = (this.keyword.trim() + ` ${tag.trim()}`).trim() + ' '
+    },
+    clearKeyword () {
+      this.keyword = ''
     }
   },
   created () {

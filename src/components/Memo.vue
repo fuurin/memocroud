@@ -9,7 +9,7 @@
     <div v-else class="card">
       <div class="card-content">
         <div class="content">
-          <textarea v-model="draft" @keyup.enter.ctrl="editMemo" :id="'draft_' + id" class="textarea" placeholder="Write your memo!"></textarea>
+          <textarea v-model="draft" @keyup.enter.ctrl="editMemo" class="textarea" placeholder="Write your memo!"></textarea>
           <small v-if="!isMobile()" class="is-pulled-right has-text-grey-light">ctrl + Enter to save</small>
         </div>
       </div>
@@ -43,27 +43,41 @@ export default {
   },
   computed: {
     memoHtml () {
-      const memoBreak = this.memo.replace(/\r?\n/g, '<br>')
-      const memoAnchor = memoBreak.replace(
-        /((http:|https:)\/\/[\x21-\x26\x28-\x7e]+)/gi,
-        "<a class='stop' target='_blank' href='$1' style='z-index:99999'>$1</a>"
-      )
+      const memoTag = this.memo
+        .replace(
+          /(#[^ \n]+\n)/gi,
+          "<a class='stop tag is-primary' style='z-index:99999'>$1</a><br/>"
+        )
+        .replace(
+          /(#[^ \n]+ )/gi,
+          "<a class='stop tag is-primary' style='z-index:99999'>$1</a>&nbsp"
+        )
+        .replace(
+          /(#[^ \n]+$)/gi,
+          "<a class='stop tag is-primary' style='z-index:99999'>$1</a>"
+        )
+      const memoBreak = memoTag.replace(/\r?\n/g, '<br>')
+      const memoAnchor = memoBreak
+        .replace(
+          /((http:|https:)\/\/[\x21-\x26\x28-\x7e]+)/gi,
+          "<a class='stop' target='_blank' href='$1' style='z-index:99999'>$1</a>"
+        )
       return memoAnchor
     }
   },
   methods: {
-    stop () {
-      console.log('stop')
-    },
     openEdit () {
       this.isEditing = true
       setTimeout(() => {
-        document.getElementById('draft_' + this.id).focus()
+        this.$el.querySelector('textarea').focus()
       }, 1)
     },
     closeEdit () {
       this.isEditing = false
       this.stopSpeech()
+      setTimeout(() => {
+        this.$el.focus()
+      }, 1)
     },
     editMemo () {
       this.stopSpeech()
@@ -125,11 +139,13 @@ export default {
     }
   },
   mounted () {
-    [].forEach.call(document.getElementsByClassName('stop'), dom => {
-      dom.addEventListener('click', ev => {
-        ev.stopPropagation()
-      })
-    })
+    this.$el.querySelectorAll('.stop').forEach(dom => dom.addEventListener('click', ev => {
+      ev.stopPropagation()
+    }))
+
+    this.$el.querySelectorAll('.tag').forEach(dom => dom.addEventListener('click', ev => {
+      this.$emit('search-tag', ev.target.text)
+    }))
   }
 }
 </script>
