@@ -30,6 +30,13 @@ import moment from 'moment'
 import isMobile from 'ismobilejs'
 import { setTimeout } from 'timers'
 
+function modifySpeechText (text) {
+  text = text.replace(/(改行|ブレイク|ブレーク|break )/g, '\n')
+  text = text.replace(/(シャープ|タグ|sharp |tag )/g, '#')
+  text = text.replace(/([^ \n])#/gi, '$1 #')
+  return text
+}
+
 export default {
   name: 'Memo',
   props: ['id', 'memo', 'created', 'collection', 'SpeechToText', 'speechLang'],
@@ -118,13 +125,17 @@ export default {
       const originalDraft = this.draft
 
       const onSpeechFinished = (text) => {
+        if (!this.isRecording) return
         this.listener.stopListening()
-        if (this.isRecording) this.draft = (originalDraft + '\n' + text).trim()
         this.isRecording = false
+        text = modifySpeechText(text)
+        this.draft = (originalDraft + '\n' + text).trim()
       }
 
       const onSpeechDetected = (text) => {
-        if (this.isRecording) this.draft = (originalDraft + '\n' + text).trim()
+        if (!this.isRecording) return
+        const modifiedText = modifySpeechText(text)
+        this.draft = (originalDraft + '\n' + modifiedText).trim()
       }
 
       try {

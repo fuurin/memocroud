@@ -68,6 +68,13 @@ const SHOW_TOP_BUTTON_PERIOD = 1000
 
 var showTopButtonTimer = null
 
+function modifySpeechText (text) {
+  text = text.replace(/(改行|ブレイク|ブレーク|break )/g, '\n')
+  text = text.replace(/(シャープ|タグ|sharp |tag )/g, '#')
+  text = text.replace(/([^ \n])#/gi, '$1 #')
+  return text
+}
+
 export default {
   name: 'Main',
   props: ['keyword', 'speechLang'],
@@ -134,16 +141,20 @@ export default {
         return
       }
 
-      const originalMemo = this.memo
+      var originalMemo = this.memo
 
       const onSpeechFinished = (text) => {
+        if (!this.isRecording) return
         this.listener.stopListening()
-        if (this.isRecording) this.memo = (originalMemo + '\n' + text).trim()
         this.isRecording = false
+        text = modifySpeechText(text)
+        this.memo = (originalMemo + '\n' + text).trim()
       }
 
       const onSpeechDetected = (text) => {
-        if (this.isRecording) this.memo = (originalMemo + '\n' + text).trim()
+        if (!this.isRecording) return
+        const modifiedText = modifySpeechText(text)
+        this.memo = (originalMemo + '\n' + modifiedText).trim()
       }
 
       try {
