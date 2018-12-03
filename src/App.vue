@@ -186,6 +186,7 @@ $footer-background-color: ivory;
 
 // customize bulma over here
 @import "../node_modules/bulma/bulma.sass";
+@import "../node_modules/bulma-extensions/bulma-tooltip/dist/css/bulma-tooltip.sass";
 
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

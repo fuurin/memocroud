@@ -16,15 +16,16 @@
       <form @submit.prevent="post" class="column is-3">
         <aside class="box" :class="{'sticky': !isMobile()}">
           <div class="content">
-            <textarea v-model="memo" @keyup.enter.ctrl="post" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
-            <small v-if="!isMobile()" class="is-pulled-right has-text-grey-light">ctrl + Enter to post</small>
+            <textarea v-model="memo" @keyup.enter.ctrl="post" @keyup.16.ctrl="speech" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
           </div>
-          <div class="content columns" style="margin-top: 0px;">
+          <div class="content columns">
             <div class="column is-9">
-              <input type="submit" class="button is-primary is-fullwidth" value="Post">
+              <button type="submit" class="button is-primary is-fullwidth tooltip" data-tooltip="ctrl + Enter to post">
+                Post
+              </button>
             </div>
             <div class="column">
-              <div class="button is-fullwidth" :class="{ 'is-danger': isRecording }" @click="speech">
+              <div class="button is-fullwidth tooltip" :class="{ 'is-danger': isRecording }" @click="speech" data-tooltip="ctrl + shift to speech">
                 <i class="fas fa-microphone"></i>
               </div>
             </div>
