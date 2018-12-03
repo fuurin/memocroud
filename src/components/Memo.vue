@@ -85,7 +85,8 @@ export default {
       this.stopSpeech()
       setTimeout(() => {
         this.$el.focus()
-      }, 1)
+        this.applyEvents()
+      }, 10)
     },
     editMemo () {
       this.stopSpeech()
@@ -146,18 +147,21 @@ export default {
         alert(error)
       }
     },
+    applyEvents () {
+      this.$el.querySelectorAll('.stop').forEach(dom => dom.addEventListener('click', ev => {
+        ev.stopPropagation()
+      }))
+
+      this.$el.querySelectorAll('.tag').forEach(dom => dom.addEventListener('click', ev => {
+        this.$emit('search-tag', ev.target.text)
+      }))
+    },
     isMobile () {
       return isMobile.any
     }
   },
   mounted () {
-    this.$el.querySelectorAll('.stop').forEach(dom => dom.addEventListener('click', ev => {
-      ev.stopPropagation()
-    }))
-
-    this.$el.querySelectorAll('.tag').forEach(dom => dom.addEventListener('click', ev => {
-      this.$emit('search-tag', ev.target.text)
-    }))
+    this.applyEvents()
   }
 }
 </script>

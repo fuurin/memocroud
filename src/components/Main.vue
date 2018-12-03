@@ -15,7 +15,7 @@
 
       <form @submit.prevent="post" class="column is-3">
         <aside class="box" :class="{'sticky': !isMobile()}">
-          <div class="content">
+          <div class="content" style="margin-bottom: 1.0em;">
             <textarea v-model="memo" @keyup.enter.ctrl="post" @keyup.16.ctrl="speech" id="draft" class="textarea" placeholder="Write your memo!" autofocus></textarea>
           </div>
           <div class="content columns">
