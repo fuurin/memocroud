@@ -40,6 +40,7 @@
             :id="memo.id"
             :memo="memo.memo"
             :created="memo.created"
+            :keyword="keyword"
             :collection="collection"
             :SpeechToText="SpeechToText"
             :speechLang="speechLang"/>
@@ -100,8 +101,12 @@ export default {
     post () {
       if (this.uid === '') return
 
-      const memo = this.memo.trim()
+      var memo = this.memo.trim()
       if (memo === '') return
+
+      if (this.keyword !== '') {
+        memo = this.keyword.split(' ').filter(word => word[0] === '#').join(' ') + '\n' + memo
+      }
 
       this.stopSpeech()
 
