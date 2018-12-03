@@ -64,13 +64,13 @@ export default {
           /(#[^ \n]+$)/gi,
           "<a class='stop tag is-primary' style='z-index:99999'>$1</a>"
         )
-      const memoBreak = memoTag.replace(/\r?\n/g, '<br>')
-      const memoAnchor = memoBreak
+      const memoAnchor = memoTag
         .replace(
-          /((http:|https:)\/\/[\x21-\x26\x28-\x7e]+)/gi,
-          "<a class='stop' target='_blank' href='$1' style='z-index:99999'>$1</a>"
+          /((http:|https:)\/\/[^ \n$]+)( |\n|$)/gi,
+          "<a class='stop' target='_blank' href='$1' style='z-index:99999'>$1</a>$3"
         )
-      return memoAnchor
+      const memoBreak = memoAnchor.replace(/\r?\n/g, '<br>')
+      return memoBreak
     }
   },
   methods: {
