@@ -1,12 +1,12 @@
 <template>
   <div class="column is-4" tabindex="0" @keyup.enter="openEdit" @keyup.esc="closeEdit" @keyup.delete="deleteMemo">
-    <a v-show="!isEditing" @click="openEdit" class="box">
+    <a v-if="!isEditing" @click="openEdit" class="box">
         <span @click.stop="deleteMemo" class="delete is-pulled-right"></span>
         <div v-html='memoHtml' style="word-break: break-all;"></div>
         <br><small class="has-text-grey">{{ created }}</small>
     </a>
 
-    <div v-show="isEditing" class="card">
+    <div v-else class="card">
       <div class="card-content">
         <div class="content">
           <textarea v-model="draft" @keyup.enter.ctrl="editMemo" class="textarea" placeholder="Write your memo!"></textarea>
